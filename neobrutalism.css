@@ -1,0 +1,337 @@
+/* =====================================================================
+   PIKAT4D — NEOBRUTALISM THEME (selaras dengan admin.html)
+   File ini menimpa tema lama pada index.html.
+   ===================================================================== */
+
+:root{
+  --nb-ink:#052e1c;
+  --nb-green:#0f7a38;
+  --nb-green-2:#16a34a;
+  --nb-lime:#d9f99d;
+  --nb-mint:#eefaf1;
+  --nb-white:#ffffff;
+  --nb-muted:#3f6b53;
+  --nb-shadow:5px 5px 0 var(--nb-ink);
+  --nb-shadow-sm:3px 3px 0 var(--nb-ink);
+  --nb-shadow-lg:8px 8px 0 var(--nb-ink);
+
+  /* menimpa token tema lama yang dipakai di seluruh halaman */
+  --bg-0:var(--nb-mint);
+  --bg-1:var(--nb-mint);
+  --bg-2:var(--nb-mint);
+  --surface-1:var(--nb-white);
+  --surface-2:var(--nb-white);
+  --surface-3:var(--nb-white);
+  --surface-4:var(--nb-white);
+  --surface-5:var(--nb-white);
+  --surface-6:var(--nb-white);
+  --text:var(--nb-ink);
+  --muted:var(--nb-muted);
+  --muted-2:var(--nb-muted);
+  --green:var(--nb-green);
+  --green-2:var(--nb-green-2);
+  --lime:var(--nb-lime);
+  --radius:14px;
+}
+
+/* ---------- Dasar ---------- */
+html,body{
+  background:var(--nb-mint) !important;
+  color:var(--nb-ink) !important;
+  font-family:'Space Grotesk',system-ui,-apple-system,sans-serif !important;
+}
+body::before,body::after,.app-root::before,.app-root::after{display:none !important}
+.app-root{background:
+  radial-gradient(circle at 12% 8%, rgba(217,249,157,.55) 0 22%, transparent 22.5%),
+  radial-gradient(circle at 88% 4%, rgba(22,163,74,.14) 0 18%, transparent 18.5%),
+  var(--nb-mint) !important;}
+
+h1,h2,h3,.title-font,.hero-title,.section-title,.market-name,.big-count,
+.modal-market-title,.footer-brand{
+  font-family:'Archivo',system-ui,sans-serif !important;
+  font-weight:900 !important;
+  letter-spacing:-.02em !important;
+  color:var(--nb-ink) !important;
+  text-shadow:none !important;
+}
+
+/* matikan semua efek kaca / blur */
+.glass,.glass-strong,.hero-copy,.hero-panel,.hero-next,.footer-card,
+.search-panel,.filter-shell,.stats-strip,.nav-shell,.modal-card,.banner-shell{
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+.glass,.glass-strong{
+  background:var(--nb-white) !important;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:var(--radius) !important;
+  box-shadow:var(--nb-shadow) !important;
+}
+
+/* ---------- Navigasi ---------- */
+.nav-wrap{background:transparent !important;border:0 !important;box-shadow:none !important}
+.nav-shell{
+  background:var(--nb-white) !important;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:var(--radius) !important;
+  box-shadow:var(--nb-shadow) !important;
+}
+.brand-logo-frame{
+  background:var(--nb-lime) !important;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:10px !important;
+  box-shadow:none !important;
+}
+.nav-link,.nav-dropdown-link{
+  color:var(--nb-ink) !important;
+  font-weight:800 !important;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  font-size:.78rem !important;
+  border:2px solid transparent !important;
+  border-radius:8px !important;
+  background:transparent !important;
+  transition:transform .12s,box-shadow .12s,background .12s;
+}
+.nav-link:hover,.nav-dropdown-link:hover{
+  background:var(--nb-lime) !important;
+  border-color:var(--nb-ink) !important;
+  box-shadow:var(--nb-shadow-sm) !important;
+  transform:translate(-1px,-1px);
+}
+.nav-link-rtp,.nav-dropdown-link-rtp{
+  background:var(--nb-lime) !important;
+  border-color:var(--nb-ink) !important;
+  box-shadow:2px 2px 0 var(--nb-ink) !important;
+}
+.nav-dropdown{
+  background:var(--nb-white) !important;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:var(--radius) !important;
+  box-shadow:var(--nb-shadow) !important;
+}
+.menu-toggle,.menu-toggle-box{
+  background:var(--nb-white) !important;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:10px !important;
+  color:var(--nb-ink) !important;
+  box-shadow:var(--nb-shadow-sm) !important;
+}
+
+/* ---------- Tombol ---------- */
+.btn-register,.btn-login,.btn-primary,.btn-secondary,.ghost-btn,
+.market-detail-btn,.market-site-link,.schedule-jump-btn,.copy-mini-btn,.filter-btn{
+  font-family:'Space Grotesk',system-ui,sans-serif !important;
+  font-weight:800 !important;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:10px !important;
+  box-shadow:var(--nb-shadow-sm) !important;
+  color:var(--nb-ink) !important;
+  background:var(--nb-white) !important;
+  transition:transform .12s,box-shadow .12s !important;
+  text-shadow:none !important;
+}
+.btn-register,.btn-primary,.market-detail-btn{
+  background:var(--nb-green) !important;
+  color:#fff !important;
+}
+.btn-login,.btn-secondary{background:var(--nb-lime) !important}
+.btn-register:hover,.btn-login:hover,.btn-primary:hover,.btn-secondary:hover,
+.ghost-btn:hover,.market-detail-btn:hover,.market-site-link:hover,
+.schedule-jump-btn:hover,.copy-mini-btn:hover,.filter-btn:hover{
+  transform:translate(-2px,-2px) !important;
+  box-shadow:var(--nb-shadow) !important;
+}
+.btn-register:active,.btn-login:active,.btn-primary:active,.btn-secondary:active,
+.market-detail-btn:active{transform:translate(0,0) !important;box-shadow:2px 2px 0 var(--nb-ink) !important}
+.filter-btn{font-size:.7rem !important;padding:.35rem .7rem !important;border-width:2px !important;box-shadow:2px 2px 0 var(--nb-ink) !important}
+.filter-btn.is-active{background:var(--nb-ink) !important;color:#fff !important}
+
+/* ---------- Hero ---------- */
+.hero-copy,.hero-panel,.hero-next{
+  background:var(--nb-white) !important;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:var(--radius) !important;
+  box-shadow:var(--nb-shadow-lg) !important;
+}
+.hero-title{font-size:clamp(2.2rem,6vw,3.6rem) !important;line-height:.95 !important}
+.hero-desc,.hero-next-about-copy{color:var(--nb-muted) !important;font-weight:500 !important}
+.hero-chip,.mini-chip,.stat-chip,.pair-chip,.digit-pill,.countdown-pill,
+.modal-countdown-pill,.badge-open,.badge-wait,.badge-cycle,.badge-done{
+  background:var(--nb-lime) !important;
+  border:2px solid var(--nb-ink) !important;
+  border-radius:999px !important;
+  color:var(--nb-ink) !important;
+  font-weight:800 !important;
+  letter-spacing:.05em;
+  box-shadow:none !important;
+  text-shadow:none !important;
+}
+.badge-open{background:#bbf7d0 !important}
+.badge-wait{background:#fde68a !important}
+.badge-cycle{background:#bae6fd !important}
+.badge-done{background:#fecaca !important}
+.section-label,.box-label,.countdown-label,.hero-next-metric-label,
+.modal-inline-metric-label,.footer-topline{
+  text-transform:uppercase !important;
+  letter-spacing:.08em !important;
+  font-size:.68rem !important;
+  font-weight:800 !important;
+  color:var(--nb-muted) !important;
+}
+.big-count,.countdown-value,.hero-next-metric-value,.modal-inline-metric-value,
+.modal-summary-value{color:var(--nb-ink) !important;text-shadow:none !important}
+.big-count{font-variant-numeric:tabular-nums;letter-spacing:-.03em !important}
+.live-dot{background:var(--nb-green-2) !important;box-shadow:0 0 0 3px rgba(22,163,74,.25) !important}
+
+.hero-next-metric,.detail-box,.modal-lite-box,.modal-compact-box,.modal-summary-card,
+.modal-top2d-box,.market-info-box,.info-row,.compact-row,.schedule-row,
+.schedule-modal-row,.modal-note-row,.pair-grid > *,.digit-wrap,.modal-digit-wrap{
+  background:var(--nb-mint) !important;
+  border:2px solid var(--nb-ink) !important;
+  border-radius:10px !important;
+  box-shadow:none !important;
+}
+
+/* ---------- Banner ---------- */
+.banner-shell,.banner-frame,.banner-stage{
+  border:3px solid var(--nb-ink) !important;
+  border-radius:var(--radius) !important;
+  box-shadow:var(--nb-shadow) !important;
+  background:var(--nb-white) !important;
+  overflow:hidden;
+}
+.banner-dots button,.banner-dots span{
+  border:2px solid var(--nb-ink) !important;
+  background:var(--nb-white) !important;
+  border-radius:999px !important;
+}
+.banner-dots .is-active,.banner-dots [aria-current="true"]{background:var(--nb-ink) !important}
+
+/* ---------- Section & pencarian ---------- */
+.section-title{font-size:clamp(1.6rem,4vw,2.4rem) !important}
+.search-panel,.filter-shell,.stats-strip,.search-wrap{
+  background:var(--nb-white) !important;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:var(--radius) !important;
+  box-shadow:var(--nb-shadow) !important;
+}
+.input-premium,input[type="search"],input[type="text"]{
+  background:var(--nb-white) !important;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:10px !important;
+  color:var(--nb-ink) !important;
+  font-family:'Space Grotesk',sans-serif !important;
+  font-weight:600 !important;
+  box-shadow:none !important;
+}
+.input-premium::placeholder{color:var(--nb-muted) !important}
+.input-premium:focus{box-shadow:var(--nb-shadow-sm) !important;outline:none !important}
+.stat-inline,.stat-chip{color:var(--nb-ink) !important}
+
+/* ---------- Kartu pasaran ---------- */
+.market-grid{gap:1.1rem !important}
+.market-grid > *{
+  background:var(--nb-white) !important;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:var(--radius) !important;
+  box-shadow:var(--nb-shadow) !important;
+  transition:transform .14s,box-shadow .14s !important;
+}
+.market-grid > *:hover{transform:translate(-3px,-3px) !important;box-shadow:var(--nb-shadow-lg) !important}
+.market-name{font-size:1.15rem !important}
+.market-code{
+  background:var(--nb-ink) !important;color:#fff !important;
+  border-radius:8px !important;font-weight:800 !important;letter-spacing:.06em;
+  padding:.15rem .5rem !important;border:2px solid var(--nb-ink) !important;
+}
+.market-empty,.banner-empty{
+  background:var(--nb-white) !important;border:3px dashed var(--nb-ink) !important;
+  border-radius:var(--radius) !important;color:var(--nb-muted) !important;
+}
+
+/* ---------- Modal ---------- */
+.modal{background:rgba(5,46,28,.55) !important;backdrop-filter:none !important}
+.modal-card{
+  background:var(--nb-white) !important;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:var(--radius) !important;
+  box-shadow:var(--nb-shadow-lg) !important;
+}
+.modal-market-shell,.modal-market-header{
+  background:var(--nb-lime) !important;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:12px !important;
+}
+.modal-market-subtitle{color:var(--nb-muted) !important}
+
+/* ---------- Footer ---------- */
+.footer-wrap{background:transparent !important;border:0 !important}
+.footer-card,.footer-inner{
+  background:var(--nb-ink) !important;
+  border:3px solid var(--nb-ink) !important;
+  border-radius:var(--radius) !important;
+  box-shadow:var(--nb-shadow) !important;
+  color:#eefaf1 !important;
+}
+.footer-card *,.footer-inner *{color:#eefaf1 !important}
+.footer-brand{color:#fff !important}
+.footer-link{
+  border:2px solid var(--nb-lime) !important;border-radius:8px !important;
+  padding:.3rem .6rem !important;font-weight:800 !important;font-size:.72rem !important;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.footer-link:hover{background:var(--nb-lime) !important;color:var(--nb-ink) !important}
+.footer-link-rtp{background:var(--nb-lime) !important;color:var(--nb-ink) !important}
+
+/* ---------- Running text ---------- */
+.cms-marquee{
+  border-top:3px solid var(--nb-ink) !important;
+  border-bottom:3px solid var(--nb-ink) !important;
+  background:var(--nb-lime) !important;
+}
+
+/* ---------- Promo & FAQ ---------- */
+.cms-promo-card,.cms-faq-item{box-shadow:var(--nb-shadow) !important}
+.cms-promo-cta:hover{transform:translate(-2px,-2px);box-shadow:var(--nb-shadow-lg)}
+
+/* ---------- Toast ---------- */
+.toast-stack > *{
+  background:var(--nb-ink) !important;color:#fff !important;
+  border:3px solid var(--nb-ink) !important;border-radius:10px !important;
+  box-shadow:var(--nb-shadow-sm) !important;font-weight:700 !important;
+}
+
+/* teks utilitas gelap bawaan tema lama */
+.text-white,.text-emerald-100\/70,.text-emerald-100\/65{color:var(--nb-ink) !important}
+.footer-card .text-white,.footer-inner .text-white{color:#fff !important}
+
+/* ---------- Perbaikan tata letak ---------- */
+.schedule-row,.info-row,.compact-row,.modal-note-row{
+  padding:.4rem .65rem !important;
+  gap:.6rem !important;
+  align-items:center;
+}
+.schedule-row > *,.info-row > *,.compact-row > *{min-width:0;overflow-wrap:anywhere}
+.schedule-row strong,.info-row strong{text-align:right}
+.market-head{gap:.6rem !important;align-items:flex-start !important}
+.market-code{display:inline-block !important;width:auto !important;font-size:.65rem !important}
+.card-info-core{padding:.7rem !important}
+.market-site-link{
+  font-size:.65rem !important;padding:.3rem .5rem !important;
+  overflow-wrap:anywhere;text-align:center;
+}
+.stat-inline{font-weight:800 !important;font-size:.75rem !important;color:var(--nb-ink) !important}
+.countdown-pill{padding:.35rem .7rem !important;text-align:right}
+.countdown-value{font-family:'Archivo',sans-serif !important;font-variant-numeric:tabular-nums}
+.state-chip{
+  display:inline-flex;align-items:center;gap:.4rem;
+  border:2px solid var(--nb-ink) !important;border-radius:999px !important;
+  padding:.2rem .6rem !important;font-size:.7rem !important;font-weight:800 !important;
+  background:var(--nb-lime) !important;color:var(--nb-ink) !important;
+}
+.state-chip.state-open,.state-chip.badge-open{background:#bbf7d0 !important}
+.modal-market-shell,.modal-market-header{padding:.8rem 1rem !important}
+.cms-marquee{position:relative;z-index:1}

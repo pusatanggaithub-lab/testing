@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Panel • PIKAT4D</title>
+<link rel="icon" href="https://i.imgur.com/iAA4oVW.png" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#052e1c; --green:#0f7a38; --green-2:#16a34a; --lime:#d9f99d;
+    --mint:#eefaf1; --white:#ffffff; --line:#052e1c; --muted:#3f6b53;
+    --shadow:5px 5px 0 var(--ink); --shadow-sm:3px 3px 0 var(--ink);
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Space Grotesk',system-ui,sans-serif;background:var(--mint);color:var(--ink)}
+  h1,h2,h3,.title{font-family:'Archivo',system-ui,sans-serif;font-weight:900;letter-spacing:-.02em;margin:0}
+  a{color:var(--green)}
+  button{font-family:inherit}
+  .btn{display:inline-flex;align-items:center;gap:.5rem;border:3px solid var(--ink);background:var(--white);
+    color:var(--ink);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;
+    padding:.55rem .9rem;border-radius:10px;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .12s,box-shadow .12s}
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+  .btn:active{transform:translate(0,0);box-shadow:2px 2px 0 var(--ink)}
+  .btn-primary{background:var(--green);color:#fff}
+  .btn-lime{background:var(--lime)}
+  .btn-danger{background:#fecaca}
+  .btn-sm{padding:.35rem .6rem;font-size:.7rem;border-width:2px;box-shadow:2px 2px 0 var(--ink)}
+  input,textarea,select{width:100%;border:3px solid var(--ink);border-radius:10px;padding:.6rem .7rem;
+    font-family:inherit;font-size:.9rem;background:#fff;color:var(--ink);outline:none}
+  input:focus,textarea:focus,select:focus{box-shadow:var(--shadow-sm)}
+  label{display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem;color:var(--muted)}
+  .field{margin-bottom:.9rem}
+  .card{background:#fff;border:3px solid var(--ink);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.1rem}
+
+  /* layout */
+  .layout{display:flex;min-height:100vh}
+  .sidebar{width:264px;flex:0 0 264px;background:var(--ink);color:#fff;padding:1.1rem .9rem;display:flex;flex-direction:column;gap:.4rem;position:sticky;top:0;height:100vh;overflow:auto}
+  .sidebar .brand{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem}
+  .sidebar .brand span{font-family:'Archivo';font-weight:900;font-size:1.05rem;letter-spacing:-.02em}
+  .sidebar .brand i{background:var(--lime);color:var(--ink);border-radius:10px;padding:.5rem .6rem}
+  .nav-item{display:flex;align-items:center;gap:.65rem;padding:.6rem .7rem;border-radius:10px;color:#e6f7ec;
+    font-weight:700;font-size:.85rem;cursor:pointer;border:2px solid transparent;text-align:left;background:none;width:100%}
+  .nav-item i{width:1.1rem;text-align:center}
+  .nav-item:hover{background:rgba(255,255,255,.08)}
+  .nav-item.active{background:var(--lime);color:var(--ink);border-color:#fff;box-shadow:3px 3px 0 rgba(255,255,255,.35)}
+  .sidebar .spacer{flex:1}
+  .main{flex:1;min-width:0;padding:1.3rem clamp(.9rem,3vw,2rem) 3rem}
+  .topbar{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+  .topbar .sub{font-size:.8rem;color:var(--muted);margin-top:.25rem}
+  .menu-btn{display:none}
+  @media (max-width:900px){
+    .sidebar{position:fixed;left:0;top:0;z-index:50;transform:translateX(-100%);transition:transform .2s}
+    .sidebar.open{transform:none}
+    .menu-btn{display:inline-flex}
+    .main{padding-top:1rem}
+  }
+
+  table{width:100%;border-collapse:collapse;font-size:.85rem}
+  th,td{text-align:left;padding:.6rem .55rem;border-bottom:2px solid rgba(5,46,28,.12);vertical-align:top}
+  th{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  tr:last-child td{border-bottom:none}
+  .table-wrap{overflow:auto}
+  .thumb{width:64px;height:40px;object-fit:cover;border:2px solid var(--ink);border-radius:6px;display:block}
+  .pill{display:inline-block;border:2px solid var(--ink);border-radius:999px;padding:.1rem .5rem;font-size:.68rem;font-weight:800;background:var(--lime)}
+  .pill.off{background:#fee2e2}
+  .grid2{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+  .group-title{font-family:'Archivo';font-weight:900;font-size.95rem;margin:1.4rem 0 .6rem;text-transform:uppercase;letter-spacing:.04em;font-size:.9rem}
+
+  .modal-back{position:fixed;inset:0;background:rgba(5,46,28,.55);display:none;align-items:flex-start;justify-content:center;padding:1.2rem;z-index:80;overflow:auto}
+  .modal-back.show{display:flex}
+  .modal-box{background:#fff;border:3px solid var(--ink);border-radius:var(--radius);box-shadow:var(--shadow);
+    width:min(640px,100%);padding:1.2rem;margin:auto}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:1rem}
+
+  .toast{position:fixed;right:1rem;bottom:1rem;z-index:120;display:flex;flex-direction:column;gap:.5rem}
+  .toast div{background:var(--ink);color:#fff;border-radius:10px;padding:.6rem .85rem;font-size:.82rem;font-weight:700;box-shadow:var(--shadow-sm)}
+  .toast div.err{background:#b91c1c}
+
+  #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.2rem}
+  #login-screen .card{width:min(400px,100%)}
+  .hidden{display:none!important}
+  .preview-frame{width:100%;height:70vh;border:3px solid var(--ink);border-radius:10px;background:#fff}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="login-screen">
+  <form class="card" id="login-form">
+    <h1 style="font-size:1.3rem">ADMIN PIKAT4D</h1>
+    <p style="font-size:.82rem;color:var(--muted);margin:.4rem 0 1.1rem">Masuk untuk mengelola konten landing page.</p>
+    <div class="field"><label for="email">Email</label><input id="email" type="email" required autocomplete="username" /></div>
+    <div class="field"><label for="password">Password</label><input id="password" type="password" required autocomplete="current-password" /></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" type="submit"><i class="fa-solid fa-right-to-bracket"></i> Masuk</button>
+    <p id="login-error" style="color:#b91c1c;font-size:.8rem;margin-top:.8rem"></p>
+  </form>
+</div>
+
+<!-- ================= APP ================= -->
+<div class="layout hidden" id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><i class="fa-solid fa-bolt"></i><span>PIKAT4D CMS</span></div>
+    <nav id="menu"></nav>
+    <div class="spacer"></div>
+    <a class="nav-item" href="index.html" target="_blank" rel="noopener"><i class="fa-solid fa-eye"></i> Lihat Website</a>
+    <button class="nav-item" id="logout"><i class="fa-solid fa-power-off"></i> Keluar</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:.7rem">
+        <button class="btn menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+        <div><h1 id="page-title" style="font-size:1.35rem">Dashboard</h1><div class="sub" id="page-sub"></div></div>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="btn btn-lime" id="preview-btn"><i class="fa-solid fa-desktop"></i> Preview</button>
+        <button class="btn btn-primary hidden" id="add-btn"><i class="fa-solid fa-plus"></i> Tambah</button>
+      </div>
+    </div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div class="modal-back" id="modal"><div class="modal-box" id="modal-box"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+/* ================= KONFIGURASI SUPABASE ================= */
+const SUPABASE_URL = 'https://mcyqojenrtpsviejxazf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jeXFvamVucnRwc3ZpZWp4YXpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2NTQ0NjksImV4cCI6MjEwMTIzMDQ2OX0.Fzv_7QrmwVqEMHDiOmbWkrOKJrL08wQEpCMwhECUTL8';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ================= DEFINISI MENU / TABEL =================
+   Menu dibuat otomatis dari daftar ini, mengikuti bagian-bagian
+   yang ada di landing page. */
+const RESOURCES = [
+  { key:'settings', label:'Pengaturan Situs', icon:'fa-solid fa-sliders', kind:'settings',
+    sub:'Logo, judul, subtitle, tombol, running text, footer, dan SEO.' },
+
+  { key:'banners', label:'Banner', icon:'fa-regular fa-images', table:'banners',
+    sub:'Slider banner pada hero landing page.', order:['sort_order'],
+    columns:['image_desktop_url','alt_text','sort_order','is_active'],
+    fields:[
+      { name:'alt_text', label:'Nama / Alt Banner', type:'text', required:true },
+      { name:'image_mobile_url', label:'Gambar Mobile (URL)', type:'url' },
+      { name:'image_desktop_url', label:'Gambar Desktop (URL)', type:'url' },
+      { name:'link_url', label:'Link Saat Diklik (opsional)', type:'url' },
+      { name:'sort_order', label:'Urutan', type:'number', default:1 },
+      { name:'is_active', label:'Aktif', type:'boolean', default:true }
+    ]},
+
+  { key:'nav_links', label:'Menu Navigasi', icon:'fa-solid fa-bars-staggered', table:'nav_links',
+    sub:'Menu header & dropdown mobile.', order:['sort_order'],
+    columns:['label','url','icon','sort_order','is_active'],
+    fields:[
+      { name:'label', label:'Teks Menu', type:'text', required:true },
+      { name:'url', label:'URL / Anchor', type:'text', required:true, default:'#beranda' },
+      { name:'icon', label:'Class Ikon (Font Awesome)', type:'text', default:'fa-solid fa-circle-chevron-right' },
+      { name:'highlight', label:'Tampilkan sebagai menu sorot', type:'boolean' },
+      { name:'sort_order', label:'Urutan', type:'number', default:1 },
+      { name:'is_active', label:'Aktif', type:'boolean', default:true }
+    ]},
+
+  { key:'markets', label:'Pasaran', icon:'fa-solid fa-globe', table:'markets',
+    sub:'Kartu pasaran, jam tutup, jam undi, dan jadwal.', order:['sort_order'],
+    columns:['name','code','close_time','draw_time','open_days','is_active'],
+    fields:[
+      { name:'id', label:'ID (huruf kecil, tanpa spasi)', type:'text', required:true, pkey:true },
+      { name:'name', label:'Nama Pasaran', type:'text', required:true },
+      { name:'code', label:'Kode', type:'text', required:true },
+      { name:'close_time', label:'Jam Tutup', type:'text', required:true, default:'17:00' },
+      { name:'draw_time', label:'Jam Undi', type:'text', required:true, default:'17:30' },
+      { name:'website', label:'Website Resmi', type:'url' },
+      { name:'open_days', label:'Hari Buka', type:'text', default:'Setiap Hari' },
+      { name:'closed_days', label:'Hari Tutup', type:'text' },
+      { name:'note', label:'Catatan', type:'textarea' },
+      { name:'cycle3h', label:'Pasaran multi sesi (tiap 3 jam)', type:'boolean' },
+      { name:'open_hours', label:'Slot Jam (pisah koma, untuk multi sesi)', type:'array' },
+      { name:'sort_order', label:'Urutan', type:'number', default:1 },
+      { name:'is_active', label:'Aktif', type:'boolean', default:true }
+    ]},
+
+  { key:'predictions', label:'Prediksi Angka', icon:'fa-solid fa-dice', table:'predictions',
+    sub:'Top 2D, Shio, 4D, dan Angka Main per pasaran. Kosongkan untuk memakai angka otomatis.',
+    columns:['market_id','angka4d','main_digits','shio','is_active'],
+    fields:[
+      { name:'market_id', label:'Pasaran', type:'select_market', required:true },
+      { name:'angka4d', label:'Angka 4D (4 digit)', type:'text', placeholder:'4821' },
+      { name:'angka3d', label:'Angka 3D', type:'text', placeholder:'821' },
+      { name:'angka2d', label:'Angka 2D', type:'text', placeholder:'21' },
+      { name:'main_digits', label:'Angka Main', type:'text', placeholder:'4 8 2 1' },
+      { name:'bbfs', label:'BBFS', type:'text', placeholder:'4 8 2 1 9' },
+      { name:'colok', label:'Colok Angka', type:'text', placeholder:'4 9' },
+      { name:'shio', label:'Shio', type:'text', placeholder:'NAGA' },
+      { name:'top2d', label:'Top 2D (pisah spasi/koma)', type:'textarea', placeholder:'48 21 94 12 ...' },
+      { name:'is_active', label:'Aktif', type:'boolean', default:true }
+    ]},
+
+  { key:'promos', label:'Promo', icon:'fa-solid fa-gift', table:'promos',
+    sub:'Kartu promo & bonus di landing page.', order:['sort_order'],
+    columns:['title','badge','sort_order','is_active'],
+    fields:[
+      { name:'title', label:'Judul Promo', type:'text', required:true },
+      { name:'description', label:'Deskripsi', type:'textarea' },
+      { name:'badge', label:'Badge', type:'text', placeholder:'BARU' },
+      { name:'image_url', label:'Gambar (URL)', type:'url' },
+      { name:'link_url', label:'Link Tombol', type:'url' },
+      { name:'cta_label', label:'Teks Tombol', type:'text', default:'Klaim Promo' },
+      { name:'sort_order', label:'Urutan', type:'number', default:1 },
+      { name:'is_active', label:'Aktif', type:'boolean', default:true }
+    ]},
+
+  { key:'faqs', label:'FAQ', icon:'fa-regular fa-circle-question', table:'faqs',
+    sub:'Pertanyaan umum.', order:['sort_order'],
+    columns:['question','sort_order','is_active'],
+    fields:[
+      { name:'question', label:'Pertanyaan', type:'text', required:true },
+      { name:'answer', label:'Jawaban', type:'textarea', required:true },
+      { name:'sort_order', label:'Urutan', type:'number', default:1 },
+      { name:'is_active', label:'Aktif', type:'boolean', default:true }
+    ]},
+
+  { key:'footer_links', label:'Link Footer', icon:'fa-solid fa-link', table:'footer_links',
+    sub:'Tautan pada bagian footer.', order:['sort_order'],
+    columns:['label','url','sort_order','is_active'],
+    fields:[
+      { name:'label', label:'Teks Link', type:'text', required:true },
+      { name:'url', label:'URL / Anchor', type:'text', required:true, default:'#beranda' },
+      { name:'highlight', label:'Tampilkan sebagai link sorot', type:'boolean' },
+      { name:'sort_order', label:'Urutan', type:'number', default:1 },
+      { name:'is_active', label:'Aktif', type:'boolean', default:true }
+    ]}
+];
+
+const GROUP_LABEL = {
+  brand:'Brand & Tombol', hero:'Hero (Judul, Subtitle, Tombol)', running_text:'Running Text',
+  section:'Judul Section', footer:'Footer', seo:'SEO & Meta', umum:'Umum'
+};
+
+/* ================= UTIL ================= */
+const $ = s => document.querySelector(s);
+const esc = v => String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+let marketOptions = [];
+
+function toast(msg, isErr){
+  const box = document.createElement('div');
+  if(isErr) box.className = 'err';
+  box.textContent = msg;
+  $('#toast').appendChild(box);
+  setTimeout(()=>box.remove(), 3200);
+}
+function openModal(html){ $('#modal-box').innerHTML = html; $('#modal').classList.add('show'); }
+function closeModal(){ $('#modal').classList.remove('show'); $('#modal-box').innerHTML=''; }
+$('#modal').addEventListener('click', e => { if(e.target.id==='modal') closeModal(); });
+
+/* ================= AUTH ================= */
+$('#login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  $('#login-error').textContent = '';
+  const { error } = await sb.auth.signInWithPassword({ email:$('#email').value.trim(), password:$('#password').value });
+  if(error){ $('#login-error').textContent = error.message; return; }
+  bootApp();
+});
+$('#logout').addEventListener('click', async () => { await sb.auth.signOut(); location.reload(); });
+
+async function checkSession(){
+  const { data } = await sb.auth.getUser();
+  if(data && data.user) bootApp();
+}
+
+function bootApp(){
+  $('#login-screen').classList.add('hidden');
+  $('#app').classList.remove('hidden');
+  renderMenu();
+  select(RESOURCES[0].key);
+}
+
+/* ================= MENU ================= */
+function renderMenu(){
+  $('#menu').innerHTML = RESOURCES.map(r =>
+    `<button class="nav-item" data-key="${r.key}"><i class="${r.icon}"></i> ${esc(r.label)}</button>`).join('');
+  $('#menu').querySelectorAll('[data-key]').forEach(btn =>
+    btn.addEventListener('click', () => { select(btn.dataset.key); $('#sidebar').classList.remove('open'); }));
+}
+$('#menu-btn').addEventListener('click', () => $('#sidebar').classList.toggle('open'));
+
+let current = null;
+function select(key){
+  current = RESOURCES.find(r => r.key === key);
+  $('#menu').querySelectorAll('[data-key]').forEach(b => b.classList.toggle('active', b.dataset.key===key));
+  $('#page-title').textContent = current.label;
+  $('#page-sub').textContent = current.sub || '';
+  $('#add-btn').classList.toggle('hidden', current.kind === 'settings');
+  if(current.kind === 'settings') renderSettings(); else renderTable();
+}
+$('#add-btn').addEventListener('click', () => openForm(null));
+$('#preview-btn').addEventListener('click', () => {
+  openModal(`<div class="modal-head"><h2 style="font-size:1.05rem">Preview Landing Page</h2>
+      <button class="btn btn-sm" onclick="closeModal()"><i class="fa-solid fa-xmark"></i> Tutup</button></div>
+    <iframe class="preview-frame" src="index.html?t=${Date.now()}"></iframe>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:.7rem">Perubahan tersimpan langsung tampil di sini.</p>`);
+});
+
+/* ================= PENGATURAN SITUS (key/value) ================= */
+async function renderSettings(){
+  $('#view').innerHTML = '<div class="card">Memuat…</div>';
+  const { data, error } = await sb.from('site_settings').select('*').order('group_name').order('sort_order');
+  if(error){ $('#view').innerHTML = `<div class="card">Gagal memuat: ${esc(error.message)}</div>`; return; }
+  const groups = {};
+  (data||[]).forEach(row => { (groups[row.group_name] = groups[row.group_name] || []).push(row); });
+
+  $('#view').innerHTML = `<form id="settings-form">` + Object.keys(groups).map(g => `
+      <div class="group-title">${esc(GROUP_LABEL[g] || g)}</div>
+      <div class="card"><div class="grid2">
+        ${groups[g].map(row => settingField(row)).join('')}
+      </div></div>`).join('') +
+    `<div style="display:flex;gap:.6rem;margin-top:1.2rem;flex-wrap:wrap">
+       <button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Semua</button>
+       <button class="btn btn-lime" type="button" onclick="$('#preview-btn').click()"><i class="fa-solid fa-eye"></i> Preview</button>
+     </div></form>`;
+
+  const META = {};
+  (data||[]).forEach(row => { META[row.key] = row; });
+
+  $('#settings-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const rows = [...e.target.querySelectorAll('[data-key]')].map(inp => {
+      const m = META[inp.dataset.key] || {};
+      return {
+        key: inp.dataset.key,
+        value: inp.type === 'checkbox' ? String(inp.checked) : inp.value,
+        label: m.label ?? inp.dataset.key,
+        group_name: m.group_name ?? 'umum',
+        field_type: m.field_type ?? 'text',
+        sort_order: m.sort_order ?? 0,
+        updated_at: new Date().toISOString()
+      };
+    });
+    const { data: saved, error } = await sb.from('site_settings')
+      .upsert(rows, { onConflict:'key' })
+      .select('key');
+    if(error) return toast('Gagal menyimpan: ' + error.message, true);
+    if(!saved || saved.length === 0){
+      return toast('Tidak ada data yang tersimpan. Kemungkinan akun ini tidak punya izin tulis (RLS).', true);
+    }
+    toast('Pengaturan tersimpan (' + saved.length + ' item).');
+    renderSettings();
+  });
+}
+
+
+function settingField(row){
+  const id = 'set-' + row.key;
+  const val = row.value == null ? '' : row.value;
+  let input;
+  if(row.field_type === 'boolean'){
+    input = `<input id="${id}" data-key="${esc(row.key)}" type="checkbox" style="width:auto" ${val==='true'?'checked':''}>`;
+  }else if(row.field_type === 'textarea'){
+    input = `<textarea id="${id}" data-key="${esc(row.key)}" rows="3">${esc(val)}</textarea>`;
+  }else{
+    input = `<input id="${id}" data-key="${esc(row.key)}" type="text" value="${esc(val)}">`;
+  }
+  const preview = (row.field_type === 'image' && val)
+    ? `<img src="${esc(val)}" alt="" class="thumb" style="margin-top:.4rem;width:100px;height:56px">` : '';
+  return `<div class="field"><label for="${id}">${esc(row.label || row.key)}</label>${input}${preview}</div>`;
+}
+
+/* ================= TABEL CRUD ================= */
+async function renderTable(){
+  const res = current;
+  $('#view').innerHTML = '<div class="card">Memuat…</div>';
+  let q = sb.from(res.table).select('*');
+  (res.order || []).forEach(col => { q = q.order(col, { ascending:true }); });
+  const { data, error } = await q;
+  if(error){ $('#view').innerHTML = `<div class="card">Gagal memuat: ${esc(error.message)}</div>`; return; }
+  if(res.key === 'markets') marketOptions = (data||[]).map(m => ({ id:m.id, name:m.name }));
+
+  if(!data || !data.length){
+    $('#view').innerHTML = `<div class="card">Belum ada data. Klik <strong>Tambah</strong> untuk membuat data baru.</div>`;
+    return;
+  }
+  $('#view').innerHTML = `<div class="card table-wrap"><table><thead><tr>
+      ${res.columns.map(c => `<th>${esc(labelOf(res, c))}</th>`).join('')}<th>Aksi</th>
+    </tr></thead><tbody>
+      ${data.map((row,i) => `<tr>${res.columns.map(c => `<td>${cellHTML(c, row[c])}</td>`).join('')}
+        <td style="white-space:nowrap">
+          <button class="btn btn-sm btn-lime" data-edit="${i}"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn btn-sm btn-danger" data-del="${i}"><i class="fa-solid fa-trash"></i></button>
+        </td></tr>`).join('')}
+    </tbody></table></div>`;
+
+  $('#view').querySelectorAll('[data-edit]').forEach(b =>
+    b.addEventListener('click', () => openForm(data[Number(b.dataset.edit)])));
+  $('#view').querySelectorAll('[data-del]').forEach(b =>
+    b.addEventListener('click', () => removeRow(data[Number(b.dataset.del)])));
+}
+
+function labelOf(res, name){
+  const f = res.fields.find(x => x.name === name);
+  return f ? f.label : name;
+}
+function cellHTML(col, val){
+  if(val === true) return '<span class="pill">Aktif</span>';
+  if(val === false) return '<span class="pill off">Nonaktif</span>';
+  if(/image|url/.test(col) && typeof val === 'string' && /^https?:/.test(val)){
+    return /image/.test(col) ? `<img src="${esc(val)}" class="thumb" alt="">`
+      : `<a href="${esc(val)}" target="_blank" rel="noopener">link</a>`;
+  }
+  if(Array.isArray(val)) return esc(val.join(', '));
+  const text = String(val == null ? '—' : val);
+  return esc(text.length > 70 ? text.slice(0,70) + '…' : text);
+}
+
+/* ---------- Form Tambah / Edit ---------- */
+async function openForm(row){
+  const res = current;
+  if(res.key === 'predictions' && !marketOptions.length){
+    const { data } = await sb.from('markets').select('id,name').order('sort_order');
+    marketOptions = data || [];
+  }
+  const isEdit = !!row;
+  openModal(`<div class="modal-head">
+      <h2 style="font-size:1.05rem">${isEdit?'Edit':'Tambah'} ${esc(res.label)}</h2>
+      <button class="btn btn-sm" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="row-form">${res.fields.map(f => fieldHTML(f, row)).join('')}
+      <div style="display:flex;gap:.6rem;margin-top:.5rem;flex-wrap:wrap">
+        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan</button>
+        <button class="btn" type="button" id="modal-cancel">Batal</button>
+      </div></form>`);
+  $('#modal-close').onclick = closeModal;
+  $('#modal-cancel').onclick = closeModal;
+  $('#row-form').addEventListener('submit', e => { e.preventDefault(); saveRow(e.target, row); });
+}
+
+function fieldHTML(f, row){
+  const raw = row ? row[f.name] : (f.default !== undefined ? f.default : '');
+  const id = 'f-' + f.name;
+  const req = f.required ? 'required' : '';
+  let input;
+  if(f.type === 'boolean'){
+    input = `<input id="${id}" name="${f.name}" type="checkbox" style="width:auto" ${raw?'checked':''}>`;
+  }else if(f.type === 'textarea'){
+    input = `<textarea id="${id}" name="${f.name}" rows="3" placeholder="${esc(f.placeholder||'')}" ${req}>${esc(raw)}</textarea>`;
+  }else if(f.type === 'select_market'){
+    input = `<select id="${id}" name="${f.name}" ${req}>${marketOptions.map(m =>
+      `<option value="${esc(m.id)}" ${raw===m.id?'selected':''}>${esc(m.name)}</option>`).join('')}</select>`;
+  }else if(f.type === 'array'){
+    input = `<input id="${id}" name="${f.name}" type="text" value="${esc(Array.isArray(raw)?raw.join(', '):(raw||''))}" placeholder="09:00, 12:00">`;
+  }else{
+    const t = f.type === 'number' ? 'number' : 'text';
+    input = `<input id="${id}" name="${f.name}" type="${t}" value="${esc(raw)}" placeholder="${esc(f.placeholder||'')}" ${req} ${row && f.pkey ? 'readonly' : ''}>`;
+  }
+  return `<div class="field"><label for="${id}">${esc(f.label)}</label>${input}</div>`;
+}
+
+async function saveRow(form, row){
+  const res = current;
+  const payload = {};
+  res.fields.forEach(f => {
+    const el = form.elements[f.name];
+    if(!el) return;
+    if(f.type === 'boolean') payload[f.name] = el.checked;
+    else if(f.type === 'number') payload[f.name] = el.value === '' ? 0 : Number(el.value);
+    else if(f.type === 'array') payload[f.name] = el.value.split(/[,;]+/).map(s => s.trim()).filter(Boolean);
+    else payload[f.name] = el.value.trim() === '' ? null : el.value.trim();
+  });
+  if(res.table === 'predictions') payload.updated_at = new Date().toISOString();
+
+  let error, saved;
+  if(row){
+    const pk = res.fields.find(f => f.pkey);
+    const idCol = pk ? pk.name : 'id';
+    if(pk) delete payload[idCol];
+    ({ data: saved, error } = await sb.from(res.table).update(payload).eq(idCol, row[idCol]).select());
+  }else{
+    ({ data: saved, error } = await sb.from(res.table).insert(payload).select());
+  }
+  if(error) return toast('Gagal menyimpan: ' + error.message, true);
+  if(!saved || saved.length === 0){
+    return toast('Perubahan tidak tersimpan. Akun ini tidak punya izin tulis (RLS) pada tabel ' + res.table + '.', true);
+  }
+  closeModal();
+  toast('Data tersimpan.');
+  renderTable();
+}
+
+async function removeRow(row){
+  if(!confirm('Hapus data ini?')) return;
+  const res = current;
+  const pk = res.fields.find(f => f.pkey);
+  const idCol = pk ? pk.name : 'id';
+  const { data: gone, error } = await sb.from(res.table).delete().eq(idCol, row[idCol]).select();
+  if(error) return toast('Gagal menghapus: ' + error.message, true);
+  if(!gone || gone.length === 0){
+    return toast('Data tidak terhapus. Akun ini tidak punya izin hapus (RLS) pada tabel ' + res.table + '.', true);
+  }
+  toast('Data dihapus.');
+  renderTable();
+}
+
+
+checkSession();
+</script>
+</body>
+</html>
