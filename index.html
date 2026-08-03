@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -6162,6 +6163,48 @@ main,
   }
 }
 
+/* ==== v12: banner arrows + running text placement ==== */
+.banner-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:6;
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(8,18,14,.55);
+  color:#fff;
+  font-size:14px;
+  cursor:pointer;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  box-shadow:0 8px 22px rgba(0,0,0,.24);
+  transition:background-color .2s ease, transform .2s ease, opacity .2s ease;
+  opacity:.9;
+}
+.banner-arrow:hover{background:rgba(8,18,14,.78);opacity:1}
+.banner-arrow:active{transform:translateY(-50%) scale(.94)}
+.banner-arrow-prev{left:14px}
+.banner-arrow-next{right:14px}
+.banner-stage.is-single .banner-arrow{display:none}
+@media (max-width:768px){
+  .banner-arrow{width:34px;height:34px;font-size:12px}
+  .banner-arrow-prev{left:10px}
+  .banner-arrow-next{right:10px}
+}
+
+.cms-marquee{
+  position:relative;
+  z-index:6;
+  margin-top:var(--nav-offset, 88px);
+}
+body.has-cms-marquee .hero{
+  padding-top:14px !important;
+}
 </style>
 </head>
 <body>
@@ -6248,6 +6291,13 @@ main,
                 tabindex="0"
               >
                 <div id="banner-track" class="banner-track"></div>
+
+                <button id="banner-prev" class="banner-arrow banner-arrow-prev" type="button" aria-label="Banner sebelumnya">
+                  <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+                </button>
+                <button id="banner-next" class="banner-arrow banner-arrow-next" type="button" aria-label="Banner berikutnya">
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
 
                 <div class="banner-controls">
                   <div id="banner-dots" class="banner-dots" aria-label="Navigasi slide"></div>
@@ -6619,6 +6669,7 @@ const BASE_MARKETS = (CMS_DATA.markets || []).length
       lastEnriched:[],
       lastFiltered:[],
       bannerIndex:0,
+      bannerSliding:false,
       bannerCount:0,
       bannerTimer:0,
       bannerDragging:false,
@@ -6693,6 +6744,8 @@ const BASE_MARKETS = (CMS_DATA.markets || []).length
       toastStack: document.getElementById('toast-stack'),
       bannerStage: document.getElementById('banner-stage'),
       bannerTrack: document.getElementById('banner-track'),
+      bannerPrev: document.getElementById('banner-prev'),
+      bannerNext: document.getElementById('banner-next'),
       bannerDots: document.getElementById('banner-dots'),
       registerBtn: document.getElementById('register-btn'),
       loginBtn: document.getElementById('login-btn'),
@@ -8034,7 +8087,7 @@ const BASE_MARKETS = (CMS_DATA.markets || []).length
     }
 
     function getBannerItems(){
-      const raw = Array.isArray(CONFIG.BANNERS) ? CONFIG.BANNERS.slice(0, 3) : [];
+      const raw = Array.isArray(CONFIG.BANNERS) ? CONFIG.BANNERS.slice() : [];
       return raw
         .filter(item => {
           const mobile = sanitizeUrl(item.mobileImageUrl);
@@ -8120,6 +8173,17 @@ const BASE_MARKETS = (CMS_DATA.markets || []).length
         `;
       }).join('');
 
+      /* klon slide pertama supaya geseran selalu ke kanan tanpa balik mundur */
+      if(state.bannerCount > 1){
+        const firstSlide = el.bannerTrack.firstElementChild;
+        if(firstSlide){
+          const clone = firstSlide.cloneNode(true);
+          clone.setAttribute('data-banner-clone','true');
+          clone.setAttribute('aria-hidden','true');
+          el.bannerTrack.appendChild(clone);
+        }
+      }
+
       el.bannerDots.innerHTML = state.bannerCount > 1
         ? banners.map((_, index) => `
             <button
@@ -8154,8 +8218,9 @@ const BASE_MARKETS = (CMS_DATA.markets || []).length
         });
       }
 
+      const activeIndex = state.bannerCount ? (state.bannerIndex % state.bannerCount) : 0;
       [...el.bannerDots.querySelectorAll('[data-banner-dot]')].forEach(dot => {
-        const active = Number(dot.dataset.bannerDot) === state.bannerIndex;
+        const active = Number(dot.dataset.bannerDot) === activeIndex;
         dot.classList.toggle('is-active', active);
         dot.setAttribute('aria-current', active ? 'true' : 'false');
       });
@@ -8169,11 +8234,42 @@ const BASE_MARKETS = (CMS_DATA.markets || []).length
       updateBanner();
     }
 
+    /* Selalu geser ke kanan. Saat slide terakhir, lanjut ke klon slide pertama
+       lalu di-reset diam-diam sehingga tidak pernah mundur ke kiri. */
     function nextBanner(){
-      goToBanner(state.bannerIndex + 1);
+      if(state.bannerCount <= 1) return;
+      if(state.bannerSliding) return;
+
+      const nextIndex = state.bannerIndex + 1;
+
+      if(nextIndex < state.bannerCount){
+        state.bannerIndex = nextIndex;
+        updateBanner();
+        return;
+      }
+
+      state.bannerSliding = true;
+      el.bannerTrack.style.transition = '';
+      el.bannerTrack.style.transform = `translate3d(-${state.bannerCount * 100}%, 0, 0)`;
+      state.bannerIndex = 0;
+
+      const activeIndex = 0;
+      [...el.bannerDots.querySelectorAll('[data-banner-dot]')].forEach(dot => {
+        const active = Number(dot.dataset.bannerDot) === activeIndex;
+        dot.classList.toggle('is-active', active);
+        dot.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+      updateBannerA11y();
+
+      window.setTimeout(() => {
+        state.bannerSliding = false;
+        updateBanner(true);
+      }, 470);
     }
 
     function prevBanner(){
+      if(state.bannerCount <= 1) return;
+      if(state.bannerSliding) return;
       goToBanner(state.bannerIndex - 1);
     }
 
@@ -8190,7 +8286,7 @@ const BASE_MARKETS = (CMS_DATA.markets || []).length
       if(state.bannerPaused) return;
       if(state.bannerCount <= 1) return;
       if(reducedMotionQuery.matches) return;
-      state.bannerTimer = window.setInterval(nextBanner, 5200);
+      state.bannerTimer = window.setInterval(nextBanner, 3500);
     }
 
     function flushBannerDragFrame(){
@@ -9441,7 +9537,7 @@ const BASE_MARKETS = (CMS_DATA.markets || []).length
         existingZe.remove();
       }
 
-      const ZENDESK_SRC = 'https://static.zdassets.com/';
+      const ZENDESK_SRC = 'https://static.zdassets.com/ekr/snippet.js?key=6043a70b-5c7b-40c9-9853-e74987d6b414';
       let zendeskLoaded = false;
 
       const loadZendesk = () => {
@@ -9528,7 +9624,10 @@ const BASE_MARKETS = (CMS_DATA.markets || []).length
       bar.setAttribute('aria-label','Informasi berjalan');
       bar.innerHTML = '<div class="cms-marquee__track"><span>' + esc(runText) + '</span><span>' + esc(runText) + '</span></div>';
       var main = document.getElementById('beranda');
-      if(main && main.parentNode) main.parentNode.insertBefore(bar, main);
+      if(main && main.parentNode){
+        main.parentNode.insertBefore(bar, main);
+        document.body.classList.add('has-cms-marquee');
+      }
     }
 
     /* ---------- Menu navigasi & link footer ---------- */
@@ -9676,8 +9775,278 @@ const BASE_MARKETS = (CMS_DATA.markets || []).length
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="neobrutalism.css" />
+  <!-- neobrutalism.css SENGAJA TIDAK dimuat di halaman depan:
+       file itu memaksa .modal{display:flex} sehingga popup kosong menutupi
+       seluruh halaman saat di-deploy (Vercel/GitHub Pages). Tetap dipakai admin.html. -->
+  <style>
+    .modal:not(.is-open){display:none !important}
+  </style>
   <!-- ===== END NEOBRUTALISM THEME ===== -->
+
+
+  <!-- ===== NEOBRUTALISM SKIN v2 (khusus tampilan; layout & struktur tidak diubah) ===== -->
+  <style id="neobrutalism-skin-v2">
+    :root{
+      --nb-ink:#0b0b0b;
+      --nb-paper:#fffdf2;
+      --nb-cream:#fdf3d9;
+      --nb-green:#16a34a;
+      --nb-green-d:#0d7a37;
+      --nb-lime:#d9f99d;
+      --nb-yellow:#fde047;
+      --nb-sky:#a5e8ff;
+      --nb-pink:#ffc8dd;
+      --nb-sh:4px 4px 0 var(--nb-ink);
+      --nb-sh-lg:7px 7px 0 var(--nb-ink);
+      --nb-sh-sm:3px 3px 0 var(--nb-ink);
+
+      --text:#0b0b0b !important;
+      --muted:rgba(11,11,11,.72) !important;
+      --muted-2:rgba(11,11,11,.55) !important;
+      --green:#16a34a !important;
+      --green-2:#0d7a37 !important;
+      --glass-blur:0px !important;
+      --glass-blur-strong:0px !important;
+      --focus-ring:0 0 0 4px var(--nb-yellow) !important;
+    }
+
+    /* ---------- kanvas ---------- */
+    html{background:var(--nb-paper) !important}
+    body{
+      color:var(--nb-ink) !important;
+      background-color:var(--nb-paper) !important;
+      background-image:
+        linear-gradient(rgba(11,11,11,.055) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(11,11,11,.055) 1px,transparent 1px) !important;
+      background-size:26px 26px,26px 26px !important;
+      background-attachment:fixed !important;
+    }
+    body::before,body::after,.app-root::before{display:none !important}
+
+    /* ---------- tipografi ---------- */
+    body,button,input,select,textarea{font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif !important}
+    .title-font,.hero-title,.section-title,.market-name,.hero-next-name,
+    .modal-market-title,.footer-brand,.brand-sub,.big-count,h1,h2,h3,h4{
+      font-family:'Archivo','Space Grotesk',sans-serif !important;
+      font-weight:900 !important;
+      letter-spacing:-.02em !important;
+      color:var(--nb-ink) !important;
+    }
+    .hero-title,.section-title,.modal-market-title{text-transform:uppercase !important}
+    .hero-title{text-shadow:3px 3px 0 var(--nb-lime) !important}
+    .section-label,.box-label,.countdown-label,.hero-next-metric-label,
+    .modal-inline-metric-label,.market-code,.footer-topline{
+      font-family:'Archivo',sans-serif !important;
+      font-weight:800 !important;
+      text-transform:uppercase !important;
+      letter-spacing:.10em !important;
+    }
+    .section-label{
+      display:inline-block !important;
+      width:fit-content !important;align-self:flex-start !important;
+      background:var(--nb-ink) !important;
+      color:var(--nb-paper) !important;
+      padding:4px 10px !important;
+      border-radius:0 !important;
+      border:2px solid var(--nb-ink) !important;
+      box-shadow:var(--nb-sh-sm) !important;
+    }
+    html body .section-label,html body .section-label *{color:var(--nb-paper) !important;-webkit-text-fill-color:var(--nb-paper) !important}
+
+    /* ---------- panel utama ---------- */
+    .glass,.glass-strong,.hero-copy,.hero-panel,.market-card,.search-panel,
+    .footer-card,.modal-card,.nav-dropdown,.schedule-box,.filter-shell,
+    .banner-frame,.toast,.hero-next{
+      background:#ffffff !important;
+      background-image:none !important;
+      border:3px solid var(--nb-ink) !important;
+      border-radius:8px !important;
+      box-shadow:var(--nb-sh-lg) !important;
+      backdrop-filter:none !important;
+      -webkit-backdrop-filter:none !important;
+    }
+    .market-card{transition:transform .12s ease,box-shadow .12s ease !important}
+    .market-card:hover{transform:translate(-3px,-3px) !important;box-shadow:10px 10px 0 var(--nb-ink) !important}
+    .hero-copy{background:var(--nb-cream) !important}
+    .hero-panel{background:#ffffff !important}
+
+    /* ---------- kotak dalam ---------- */
+    .market-info-box,.detail-box,.number-box,.modal-lite-box,.modal-compact-box,
+    .modal-summary-card,.modal-top2d-box,.modal-stat,.hero-next-metric,
+    .modal-inline-metric,.schedule-modal-row,
+    .modal-market-shell,.hero-next-about,.pair-chip,.stat-chip,.mini-chip{
+      background:var(--nb-paper) !important;
+      border:2px solid var(--nb-ink) !important;
+      border-radius:6px !important;
+      box-shadow:var(--nb-sh-sm) !important;
+      backdrop-filter:none !important;
+    }
+    .info-row{border-bottom:2px solid rgba(11,11,11,.14) !important}
+    .info-row:last-child{border-bottom:0 !important}
+    .market-info-box{background:var(--nb-cream) !important}
+    .market-head{align-items:flex-start !important;gap:8px !important}
+    .market-name{font-size:.92rem !important;letter-spacing:-.03em !important;overflow-wrap:normal !important;word-break:normal !important;min-width:0 !important;padding-right:84px !important}
+    .market-code{padding-right:84px !important}
+    .market-head .state-chip{flex:0 0 auto !important}
+    .schedule-row,.compact-row{
+      background:transparent !important;border:0 !important;border-bottom:2px dashed rgba(11,11,11,.18) !important;
+      border-radius:0 !important;box-shadow:none !important;
+    }
+    .schedule-list .schedule-row:last-child,.compact-row:last-child{border-bottom:0 !important}
+    .schedule-row > strong,.compact-row > strong,.info-row > strong{color:var(--nb-ink) !important;font-weight:800 !important}
+
+    /* ---------- tombol ---------- */
+    .btn-primary,.btn-register,.market-detail-btn,.schedule-jump-btn,
+    .btn-secondary,.btn-login,.ghost-btn,.copy-mini-btn,.filter-btn,
+    .banner-arrow,.menu-toggle,.menu-toggle-box,.market-site-link,.footer-link-rtp{
+      border:2.5px solid var(--nb-ink) !important;
+      border-radius:6px !important;
+      box-shadow:var(--nb-sh) !important;
+      font-family:'Archivo',sans-serif !important;
+      font-weight:800 !important;
+      letter-spacing:.02em !important;
+      text-transform:uppercase !important;
+      transition:transform .1s ease,box-shadow .1s ease !important;
+      backdrop-filter:none !important;
+      text-shadow:none !important;
+    }
+    .btn-primary,.btn-register,.market-detail-btn{
+      background:var(--nb-green) !important;background-image:none !important;color:#fff !important;
+    }
+    .btn-secondary,.btn-login,.ghost-btn,.copy-mini-btn,.filter-btn,
+    .schedule-jump-btn,.market-site-link,.footer-link-rtp,.menu-toggle,.menu-toggle-box{
+      background:#ffffff !important;background-image:none !important;color:var(--nb-ink) !important;
+    }
+    .filter-btn.is-active{background:var(--nb-yellow) !important;color:var(--nb-ink) !important}
+    .btn-primary:hover,.btn-register:hover,.market-detail-btn:hover,
+    .btn-secondary:hover,.btn-login:hover,.ghost-btn:hover,.copy-mini-btn:hover,
+    .filter-btn:hover,.schedule-jump-btn:hover{
+      transform:translate(-2px,-2px) !important;box-shadow:6px 6px 0 var(--nb-ink) !important;
+    }
+    .btn-primary:active,.btn-register:active,.market-detail-btn:active,
+    .btn-secondary:active,.btn-login:active,.ghost-btn:active,.copy-mini-btn:active,
+    .filter-btn:active{transform:translate(2px,2px) !important;box-shadow:1px 1px 0 var(--nb-ink) !important}
+
+    /* ---------- header / nav ---------- */
+    .nav-shell{
+      background:var(--nb-paper) !important;background-image:none !important;
+      border:0 !important;border-bottom:3px solid var(--nb-ink) !important;
+      border-radius:0 !important;box-shadow:0 4px 0 rgba(11,11,11,.18) !important;
+      backdrop-filter:none !important;-webkit-backdrop-filter:none !important;
+    }
+    .nav-link,.nav-dropdown-link,.footer-link{
+      font-family:'Archivo',sans-serif !important;font-weight:800 !important;
+      color:var(--nb-ink) !important;text-transform:uppercase !important;letter-spacing:.02em !important;
+      border-radius:6px !important;
+    }
+    .nav-link:hover,.nav-dropdown-link:hover,.footer-link:hover{
+      background:var(--nb-lime) !important;color:var(--nb-ink) !important;
+    }
+    .nav-link-rtp,.nav-dropdown-link-rtp{background:var(--nb-pink) !important;border:2px solid var(--nb-ink) !important}
+    .brand-logo-frame{border:0 !important;background:transparent !important;box-shadow:none !important}
+
+    /* ---------- marquee ---------- */
+    .cms-marquee{
+      background:var(--nb-yellow) !important;background-image:none !important;
+      color:var(--nb-ink) !important;
+      border-top:3px solid var(--nb-ink) !important;
+      border-bottom:3px solid var(--nb-ink) !important;
+      font-family:'Archivo',sans-serif !important;font-weight:800 !important;
+      text-transform:uppercase !important;letter-spacing:.06em !important;
+      backdrop-filter:none !important;box-shadow:none !important;
+    }
+
+    /* ---------- banner slider ---------- */
+    .banner-frame,.banner-shell{border-radius:8px !important;overflow:hidden !important}
+    .banner-slide,.banner-picture,.banner-picture img{border-radius:0 !important}
+    .banner-arrow{
+      background:var(--nb-paper) !important;color:var(--nb-ink) !important;
+      border-radius:6px !important;width:42px !important;height:42px !important;opacity:1 !important;
+    }
+    .banner-dot{
+      background:#ffffff !important;border:2px solid var(--nb-ink) !important;
+      border-radius:0 !important;box-shadow:2px 2px 0 var(--nb-ink) !important;
+    }
+    .banner-dot.is-active{background:var(--nb-green) !important}
+
+    /* ---------- status / badge ---------- */
+    .state-chip,.badge-open,.badge-wait,.badge-cycle,.badge-done,.badge-neutral,
+    .state-open,.state-wait,.state-cycle,.state-done,.hero-chip,.hero-next-phase{
+      border:2px solid var(--nb-ink) !important;
+      border-radius:999px !important;
+      box-shadow:var(--nb-sh-sm) !important;
+      font-family:'Archivo',sans-serif !important;font-weight:800 !important;
+      text-transform:uppercase !important;letter-spacing:.04em !important;
+      backdrop-filter:none !important;color:var(--nb-ink) !important;
+    }
+    .badge-open,.state-open{background:var(--nb-lime) !important}
+    .badge-wait,.state-wait{background:var(--nb-yellow) !important}
+    .badge-cycle,.state-cycle{background:var(--nb-sky) !important}
+    .badge-done,.state-done{background:var(--nb-pink) !important}
+    .badge-neutral,.hero-chip,.hero-next-phase{background:#ffffff !important}
+
+    /* ---------- angka / countdown ---------- */
+    .hero-next-count-wrap{
+      background:var(--nb-ink) !important;background-image:none !important;
+      border:3px solid var(--nb-ink) !important;border-radius:10px !important;
+      box-shadow:var(--nb-sh) !important;
+    }
+    .hero-next-count-wrap .big-count{color:var(--nb-lime) !important}
+    .hero-next-count-wrap .hero-next-phase{
+      background:var(--nb-lime) !important;color:var(--nb-ink) !important;
+      width:fit-content !important;margin-top:8px !important;
+      border:2px solid var(--nb-lime) !important;box-shadow:none !important;
+    }
+    .countdown-pill,.modal-countdown-pill,.digit-wrap,.modal-digit-wrap{
+      background:var(--nb-ink) !important;background-image:none !important;
+      border:3px solid var(--nb-ink) !important;border-radius:8px !important;
+      box-shadow:var(--nb-sh) !important;
+    }
+    .countdown-pill,.countdown-value,.big-count,.modal-countdown-pill{color:var(--nb-lime) !important}
+    .countdown-label{color:rgba(255,255,255,.75) !important}
+    .digit-pill{
+      background:var(--nb-yellow) !important;color:var(--nb-ink) !important;
+      border:2px solid var(--nb-ink) !important;border-radius:6px !important;
+      box-shadow:2px 2px 0 var(--nb-ink) !important;font-weight:900 !important;
+    }
+    .number-value,.modal-summary-value,.modal-inline-metric-value,
+    .hero-next-metric-value{color:var(--nb-ink) !important;font-weight:900 !important}
+
+    /* ---------- input ---------- */
+    .input-premium,.search-panel input,input[type="text"],input[type="search"],textarea,select{
+      background:#ffffff !important;color:var(--nb-ink) !important;
+      border:2.5px solid var(--nb-ink) !important;border-radius:6px !important;
+      box-shadow:var(--nb-sh-sm) !important;font-weight:600 !important;
+    }
+    .input-premium:focus,input:focus,textarea:focus,select:focus{
+      outline:none !important;box-shadow:var(--nb-sh) !important;background:var(--nb-cream) !important;
+    }
+    ::placeholder{color:rgba(11,11,11,.45) !important}
+    .search-panel{padding-block:14px !important}
+
+    /* ---------- modal ---------- */
+    .modal{background:rgba(11,11,11,.55) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+    .modal-card{box-shadow:10px 10px 0 var(--nb-ink) !important}
+
+    /* ---------- footer ---------- */
+    .footer-wrap,.footer-core,.footer-inner{background:transparent !important}
+    .footer-card{background:var(--nb-cream) !important}
+    .footer-note,.footer-copy{color:rgba(11,11,11,.68) !important}
+
+    /* ---------- teks util lama (tailwind gelap) ---------- */
+    .text-emerald-100\/70,.text-emerald-300,.text-teal-300,.text-blue-300,.text-yellow-300{
+      color:rgba(11,11,11,.72) !important;
+    }
+    .live-dot{box-shadow:0 0 0 2px var(--nb-ink) !important}
+
+    /* ---------- mobile ---------- */
+    @media (max-width:640px){
+      :root{--nb-sh:3px 3px 0 var(--nb-ink);--nb-sh-lg:5px 5px 0 var(--nb-ink)}
+      .hero-title{text-shadow:2px 2px 0 var(--nb-lime) !important}
+      .banner-arrow{width:36px !important;height:36px !important}
+    }
+  </style>
+  <!-- ===== END NEOBRUTALISM SKIN v2 ===== -->
 
 </body>
 
