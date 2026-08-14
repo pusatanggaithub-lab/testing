@@ -1,0 +1,54 @@
+[
+  {
+    "id": 1,
+    "kategori": "Jam Operasional",
+    "keywords": [
+      "jam", "buka", "tutup", "operasional", "jadwal", "hari", 
+      "jm", "bka", "ttp", "buka jam", "jam brpa", "jam brp", 
+      "jam berapa", "pukul", "sampe jam", "ampe jam", "hari apa",
+      "weekend", "libur", "buka gak", "buka ga", "buka gk", "bukaa"
+    ],
+    "jawaban": "Kami buka setiap hari Senin - Jumat pukul 08.00 - 17.00 WIB. Hari Sabtu, Minggu, dan Libur Nasional kami tutup ya!"
+  },
+  {
+    "id": 2,
+    "kategori": "Harga & Layanan",
+    "keywords": [
+      "harga", "biaya", "tarif", "paket", "bayar", "sewa", 
+      "pricenya", "price", "berapaan", "brp", "brpa", "hrga", 
+      "muraahh", "murah", "mahal", "fee", "bayarnya", "ongkos",
+      "list harga", "spill harga", "diskon", "promo"
+    ],
+    "jawaban": "Layanan kami mulai dari Paket Basic (Rp 150.000/bulan) hingga Paket Pro (Rp 350.000/bulan). Detail lengkap bisa kamu cek di menu Layanan ya!"
+  },
+  {
+    "id": 3,
+    "kategori": "Lokasi & Alamat",
+    "keywords": [
+      "lokasi", "alamat", "dimana", "kantor", "posisi", "peta", 
+      "dmn", "dimana ya", "dimana sih", "maps", "gmaps", "lokasina",
+      "daerah mana", "sebelah mana", "patokan", "tempat", "posisinya"
+    ],
+    "jawaban": "Kantor kami berlokasi di Jl. Sudirman No. 123, Jakarta Selatan. Kamu juga bisa cari di Google Maps dengan mengetik nama perusahaan kami!"
+  },
+  {
+    "id": 4,
+    "kategori": "Kontak & CS",
+    "keywords": [
+      "kontak", "admin", "hubungi", "whatsapp", "wa", "telepon", "email", "cs",
+      "nomor", "no wa", "call", "minta wa", "minta no", "helpdesk",
+      "chat admin", "hub", "min", "mimin", "gan", "bro", "sis"
+    ],
+    "jawaban": "Kamu bisa langsung hubungi Tim CS/Admin kami via WhatsApp di 0812-3456-7890 atau email ke support@perusahaan.com."
+  },
+  {
+    "id": 5,
+    "kategori": "Cara Pemesanan",
+    "keywords": [
+      "cara", "pesan", "order", "beli", "daftar", "langkah", 
+      "gimana", "gmn", "gmna", "caranya", "pesennya", "ordernya",
+      "mau pesan", "mau order", "tutor", "tutorial", "cara beli"
+    ],
+    "jawaban": "Caranya gampang banget: 1. Pilih paket layanan, 2. Isi formulir pendaftaran, 3. Lakukan pembayaran via Transfer Bank / E-Wallet."
+  }
+]
