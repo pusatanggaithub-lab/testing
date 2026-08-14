@@ -48,3 +48,14 @@ def chat():
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
+
+
+from flask import Flask, render_template, request, jsonify, send_from_directory
+import os
+
+# (Kode app.py kamu yang lainnya tetap sama...)
+
+# Tambahkan route ini di app.py:
+@app.route('/widget.js')
+def serve_widget():
+    return send_from_directory(os.path.dirname(__file__), 'widget.js')
